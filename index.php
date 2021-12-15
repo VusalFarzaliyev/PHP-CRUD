@@ -13,7 +13,7 @@ if(isset($_POST['submit']) and !empty($_POST['name']) and !empty($_POST['name'])
         echo
         '
             <div class="alert alert-success" role="alert">
-              Data inserted successfuly!
+             Məlumat əlava edildi!
             </div>
         ';
     }
@@ -24,7 +24,6 @@ if(isset($_POST['submit']) and !empty($_POST['name']) and !empty($_POST['name'])
         exit();
     }
 }
-
 //Data Delete
 if(isset($_GET['delete']))
 {
@@ -36,13 +35,37 @@ if(isset($_GET['delete']))
         echo
         '
             <div class="alert alert-danger" role="alert">
-              Data deleted successfuly!
+            Məlumat uğurla silindi!
             </div>
         ';
     }
     else
     {
         echo "Data not inserted";
+        echo $sql;
+        exit();
+    }
+
+
+
+}
+// ALL Data Delete
+if(isset($_POST['delete_all']))
+{
+    $sql = "DELETE FROM `user` ";
+    $query =mysqli_query($connect,$sql);
+    if($query)
+    {
+        echo
+        '
+            <div class="alert alert-danger" role="alert">
+              Bütün məlumatlar silindi!
+            </div>
+        ';
+    }
+    else
+    {
+        echo "Data not deleted";
         echo $sql;
         exit();
     }
@@ -76,9 +99,10 @@ if(isset($_POST['update']))
         echo
         '
             <div class="alert alert-warning" role="alert">
-              Data updated successfuly!
+              Məlumat uğurla dəyişdirildi!
             </div>
         ';
+
     }
 
 }
@@ -103,55 +127,75 @@ if(isset($_POST['update']))
             <form class="mt-5" action="index.php" method="post">
                 <input name="id" type="hidden" value="<?=$id;?>">
                 <div class="form-group">
-                    <input type="text" name="name" class="form-control" placeholder="Name"  value="<?=$name;?>" >
+                    <input type="text" name="name" class="form-control" placeholder="Ad"  value="<?=$name;?>" >
                 </div>
                 <div class="form-group">
-                    <input type="text" name="surname" class="form-control" placeholder="Surname" value="<?=$surname;?>">
+                    <input type="text" name="surname" class="form-control" placeholder="Soyad" value="<?=$surname;?>">
                 </div>
                 <?php
                     if($update==true):
                 ?>
-                <button type="submit" name="update" class="btn btn-info">Update</button>
+                <button type="submit" name="update" class="btn btn-success">Düzəlt</button>
                 <?php
                     else:
                 ?>
-                <button type="submit" name="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" name="submit" class="btn btn-primary">Yadda saxla</button>
                 <?php
                     endif;
                 ?>
+                <a href="index.php" class="btn btn-warning" type="reset" value="Reset">Yenilə</a>
+                <button name="delete_all" class="btn btn-danger">Hamısını sil</button>
             </form>
+
         </div>
         <div class="col-md-8">
-            <table class="table table-bordered table-dark mt-5">
+            <nav class="navbar navbar-light mt-5">
+                <form class="form-inline" action="index.php" method="get">
+                    <input class="form-control mr-sm-2" type="search" placeholder="Axtarış" name="text" aria-label="Search">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit" name="search">Axtar</button>
+                </form>
+            </nav>
+            <table class="table table-bordered table-dark">
                 <thead>
                 <tr>
                     <th scope="col">№</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Surname</th>
-                    <th scope="col">Operation</th>
+                    <th scope="col">Ad</th>
+                    <th scope="col">Soyad</th>
+                    <th scope="col">Əməliyyatlar</th>
                 </tr>
                 </thead>
                 <?php
-                $sql = "SELECT * FROM user ORDER BY id DESC";
+                if(isset($_GET['text']))
+                {
+                    $searchKey = $_GET['text'];
+                    $sql = "SELECT * FROM user WHERE CONCAT(name,surname)  LIKE '%$searchKey%'";
+                }
+                else
+                {
+                    $sql = "SELECT * FROM user ORDER BY id DESC";
+                }
                 $query =mysqli_query($connect,$sql);
                 $all =mysqli_fetch_all($query,1);
                 foreach ($all as $key => $value)
                 {
                 ?>
+
                 <tbody>
                 <tr>
                     <th><?=$value['id'];?></th>
                     <th><?=$value['name'];?></th>
                     <th><?=$value['surname'];?></th>
                     <th>
-                        <a href="index.php?edit=<?=$value['id'];?>" class="btn btn-primary">Edit</button>
-                        <a href="index.php?delete=<?=$value['id'];?>" class="btn btn-danger ml-1">Delete</a>
+                        <a href="index.php?edit=<?=$value['id'];?>" class="btn btn-primary">Düzəlt</button>
+                        <a href="index.php?delete=<?=$value['id'];?>" class="btn btn-danger ml-3">Sil</a>
 
                     </th>
 
                 </tr>
                 </tbody>
-                <?php } ?>
+                <?php
+                }
+                ?>
             </table>
         </div>
     </div>
